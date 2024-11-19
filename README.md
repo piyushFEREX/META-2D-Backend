@@ -1,20 +1,20 @@
 
-# Meta-2D
+# Meta-2D-Backend
 
-Meta-2D is a Node.js backend designed for managing and testing 2D animations. It includes:
-- Lightweight API design.
-- Comprehensive test suite using Jest.
-- Easily extensible for advanced use cases.
+This Backend is under production, i am making this as a self learning project. It includes:
+- Lightweight API design 🚀.
+- Comprehensive test suite using Jest 🃏.
+- Easily extensible for advanced use cases 🕵🏻‍♀.
+- Open to Contributors 👨🏻‍💻👍.
 
-## Table of Contents
+## Table of Contents 📃
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
 - [Tests](#tests)
-- [Contributing](#contributing)
-- [License](#license)
 
-## About the Project
+
+## About the Project 😃
 
 ### Built With
 - [Node.js](https://nodejs.org/)
