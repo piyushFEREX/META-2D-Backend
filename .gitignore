@@ -1,0 +1,33 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+logs/
+
+# Build files
+dist/
+build/
+
+# Test coverage
+coverage/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Editor configurations
+.vscode/
+.idea/
+*.iml
+
+# Debugging tools
+*.pid
