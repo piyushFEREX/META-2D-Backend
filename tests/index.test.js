@@ -1,10 +1,6 @@
 const { default: axios } = require("axios")
 
-const sum =(a,b)=>{
-    return a+b
-}
-
-const BACKEND_URL = `https://reqres.in`
+const BACKEND_URL = ``
 const Ws_URL = ``
 
 
@@ -668,6 +664,10 @@ describe("WebSocket tests", () => {
     let Ws2;
     let Ws1Messages=[];
     let Ws2Messages=[];
+    let userX;
+    let userY;
+    let AdminX;
+    let AdminY;
 
     function waitForAndPopLatestMessage(messageArray){
         return new Promise(r =>{
@@ -809,11 +809,99 @@ describe("WebSocket tests", () => {
         }
 
 
+       
     }
 
 
-    beforeAll(async () => {
-          });
+    beforeAll(async () => {setUpHTTP(); setupWs()});
+
+    test('Get back acknolegement for joining a space', async () => {
+        Ws1.send(JSON.stringify({
+            "type": "join",
+            "payload": {
+	        "spaceId": spaceId,
+	        "token": adminToken
+    }
+}))
+const message1 = await waitForAndPopLatestMessage(Ws1Messages)
+        Ws2.send(JSON.stringify({
+            "type": "join",
+            "payload": {
+	        "spaceId": spaceId,
+	        "token": userToken
+    }
+        }))
+        const message2 = await waitForAndPopLatestMessage(Ws2Messages)
+        const message3 = await waitForAndPopLatestMessage(Ws1Messages)
+
+        
+        expect(message1.type).toBe("space-joined")
+        expect(message2.type).toBe("space-joined")
+        expect(message1.payload.users.length).toBe(0)
+        expect(message2.payload.users.length).toBe(1)
+        expect(message3.type).toBe("space-joined")
+        expect(message3.payload.x).toBe(message2.payload.spawn.x)
+        expect(message3.payload.y).toBe(message2.payload.spawn.y)
+        expect(message3.payload.userId).toBe(userId)
+        
+
+        AdminX = message1.payload.spawn.x
+        AdminY = message1.payload.spawn.Y
+
+        userX = message2.payload.spawn.X
+        userY = message2.payload.spawn.Y
+    });
+    test('User should not be able to move across the boundary of the wall ',async () => {
+        Ws1.send(JSON.stringify({
+            type:'movement',
+           payload:{
+            x:10000,
+            y:900000
+           }
+        }))
+
+        const message = await waitForAndPopLatestMessage(Ws1Messages);
+        expect(message.type).toBe('movement-rejected')
+        expect(message.payload.x).toBe(AdminX)
+        expect(message.payload.y).toBe(AdminY)
+    });
+
+    test('User should not be able to move across two blocks a time ',async () => {
+        Ws1.send(JSON.stringify({
+            type:'movement',
+           payload:{
+            x:AdminX+2,
+            y:AdminY
+           }
+        }))
+
+        const message = await waitForAndPopLatestMessage(Ws1Messages);
+        expect(message.type).toBe('movement-rejected')
+        expect(message.payload.x).toBe(AdminX)
+        expect(message.payload.y).toBe(AdminY)
+    });
+    test('Current movement should be broadcasted to the other sockets in the room',async () => {
+        Ws1.send(JSON.stringify({
+            type:'movement',
+            payload:{
+            x:AdminX+1,
+            y:AdminY,
+            userId: adminId
+           }
+        }))
+
+        const message = await waitForAndPopLatestMessage(Ws1Messages);
+        expect(message.type).toBe('movement')
+        expect(message.payload.x).toBe(AdminX)
+        expect(message.payload.y).toBe(AdminY)
+    });
+    test('If a user leaves the other user receaves a leave event',async () => {
+      Ws1.close()
+
+        const message = await waitForAndPopLatestMessage(Ws2Messages);
+        expect(message.type).toBe('user-left')
+        expect(message.payload.userId).toBe(adminId)
+    });
 
 });
 
